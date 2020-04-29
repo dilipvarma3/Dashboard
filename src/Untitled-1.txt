@@ -1,0 +1,31 @@
+{
+    name,phno,email
+}
+const details=[{
+    name:"Dilip",
+    phno:"1232456",
+    email:"asdkj@gsdljkn.com"
+},
+{
+    name:"Dilip",
+    phno:"1232456",
+    email:"asdkj@gsdljkn.com"
+},
+{
+    name:"Dilip",
+    phno:"1232456",
+    email:"asdkj@gsdljkn.com"
+}
+]
+
+
+state={
+    details:details
+    
+}
+this.setState((preveState)=>{
+    let st=preveState;
+    st.details.push();
+    return st
+}
+)
