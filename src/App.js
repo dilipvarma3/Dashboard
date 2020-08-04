@@ -1,11 +1,13 @@
+
+
 import React from 'react';
 import './App.css';
-import { Layout, Avatar, Menu, Icon, Breadcrumb, Skeleton, Drawer, Button } from 'antd';
+import { Layout, Avatar, Menu, Breadcrumb, Skeleton, Drawer, Button, Popover } from 'antd';
 import Title from 'antd/lib/typography/Title';
 import SubMenu from 'antd/lib/menu/SubMenu';
 import { getTwoToneColor, setTwoToneColor, PhoneOutlined } from '@ant-design/icons';
 import { BrowserRouter as Router, Route, Link} from "react-router-dom";
-import { Form, Input, Table,  Checkbox } from 'antd';
+import { Form, Input, InputNumber, Table,  Checkbox } from 'antd';
 import { SearchOutlined, UserOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import 'antd/dist/antd.css';
@@ -13,6 +15,13 @@ import { Tabs } from 'antd';
 import { Empty } from 'antd';
 import PhoneMissedIcon from '@material-ui/icons/PhoneMissed';
 import SvgIcon from '@material-ui/core/SvgIcon';
+import PhoneIcon from '@material-ui/icons/Phone';
+import Icon from '@material-ui/core/Icon';
+import { AmplifyAuthenticator, AmplifySignUp, AmplifySignOut } from '@aws-amplify/ui-react';
+import axios from 'axios';
+import withOAuth from 'aws-amplify';
+import {Auth} from 'aws-amplify';
+
 
 const { TabPane } = Tabs;
 
@@ -21,18 +30,35 @@ const { TabPane } = Tabs;
 const { Header, Footer, Sider, Content } = Layout;
 
 
-export default class App extends React.Component {
+ export default class App extends React.Component {
     state = {
         pagename: "",
-        details: details,
+        details: [],
         name:"",
-        phno:"",
+        phno:0,
         email:"",
         searchText: '',
-    searchedColumn: '',
-    //   
-    visible: false
+    searchedColumn: '',  
+    visible: false,
+    token:"",
+    hours:0,
+    minutes:0,
+    timeOfDay:{
+      hours:this.hours,
+      minutes:this.minutes
     }
+    // test:
+     }
+    
+    // async componentDidMount(){
+    //   const url="https://virtserver.swaggerhub.com/good-morning-c/DashboardAPI/1.0.0/clients/";
+    //   const response= await fetch(url);
+    //   const data= await response.json();
+    //   console.log(data[0].careCircle[0].name); // data retrievel way
+    //   console.log(data[0].phoneNumber);// phno retrievel
+    //   this.setState({details:data})
+
+    // }
     showDrawer = () => {
     
       
@@ -40,7 +66,42 @@ export default class App extends React.Component {
         visible: true,
       });
     };
-  
+    showClients=(e)=>{
+      this.setState({
+        pagename:"allclients"
+    });
+    Auth.currentSession().then(response=>{
+      this.setState({token:response.getIdToken().getJwtToken()})
+      // console.log(this.state.token)
+      axios.get("https://staging.goodmorningcalls.com/api/clients",{
+      headers:{
+      authorization: this.state.token}
+    }
+  )
+    .then((res)=>{
+      console.log(res);
+    const repos=res.data.data;
+    console.log(repos)
+    this.setState({details:repos});
+    console.log(this.state.details);
+    
+    })
+    
+
+    });
+    // axios.defaults.headers.common['authorization']=`Bearer ${this.state.token}`
+  //   axios.get("https://staging.goodmorningcalls.com/api",{
+  //     headers:{
+  //     authorization: this.state.token}
+  //   }
+  // )
+  //   .then((res)=>{
+  //     console.log(res);
+  //   const repos=res.data;
+  //   this.setState({details:repos});
+  //   console.log(this.state.details);
+  //   })
+    };
     onClose = () => {
       this.setState({
         visible: false,
@@ -118,6 +179,12 @@ export default class App extends React.Component {
           handleChange2=(event)=> { 
             this.setState({email: event.target.value}); 
           }
+          handleChange3=(event)=> { 
+            this.setState({hours: parseInt(event.target.value)}); 
+          }
+          handleChange4=(event)=> { 
+            this.setState({minutes: parseInt(event.target.value)}); 
+          }
     individuallog=(event)=>{
         // alert("hello"+this.state.details)
         
@@ -130,23 +197,74 @@ export default class App extends React.Component {
     }
     
     addclient = () => {
-        this.setState((preveState) => {
-            let st = preveState;
-            st.details.push({
-                name: this.state.name,
-                phno: this.state.phno,
-                email: this.state.email
-            });
-            alert("succesfully stored client details");
-            return st;
+        // this.setState((preveState) => {
+        //     let st = preveState;
+        //     st.details.push({
+        //         name: this.state.name,
+        //         phoneNumber: this.state.phno,
+        //         email: this.state.email
+        //     });
+        Auth.currentSession().then(response=>{
+          this.setState({token:response.getIdToken().getJwtToken()})
+          console.log(this.state.token)
+            //  const data={
+            //   "id" : "3fa85f64-5717-4562-b3fc-2c963f66afa8",
+            //   "name" : "Nick",
+            //   "email" : "example@example1.com",
+            //   "phoneNumber" : "+155555555551",
+            //   "timeOfDay" : {
+            //     "hours" : 10,
+            //     "minutes" : 30
+            //   },
+            //   "careCircle" : [ {
+            //     "name" : "j",
+            //     "phoneNumber" : "+15555555554",
+            //     "email" : "example2@example.com"
+            //   } ],
+            //   "userId" : "4fa81234-5717-4562-b3fc-2c963f66afa6"
+            // }
+            const data={
+              // "id" : "3fa85f64-5717-4562-b3fc-2c963f66afa0",
+              "name": this.state.name,
+              
+              "email":this.state.email,
+              "phoneNumber":this.state.phno,
+              
+              "timeOfDay" : {
+                "hours" : this.state.hours,
+                "minutes" : this.state.minutes
+              }
+           
+          }
+          console.log(data)
+            // alert("succesfully stored client details");
+            // console.log(this.state.details);
+            axios.post('https://staging.goodmorningcalls.com/api/clients',data,{
+              headers:{
+                authorization:this.state.token
+              }
+            } )
+            .then(response=>{
+              console.log(response)
+            })
+            .catch(error=>{
+              console.log(error)
+            })
+            
+            
+            // return st;
             
 
-        })
-    }
+        // })
+        
+        
+    })
+  }
     setpagename = (name) => {
         this.setState({ pagename: name })
     }
     render() {
+      
       const columns = [
         {
           title: 'Name',
@@ -157,10 +275,10 @@ export default class App extends React.Component {
         },
         {
           title: 'Phno',
-          dataIndex: 'phno',
-          key: 'phno',
+          dataIndex: 'phoneNumber',
+          key: 'phoneNumber',
           width: '20%',
-          ...this.getColumnSearchProps('phno'),
+          ...this.getColumnSearchProps('phoneNumber'),
         },
         {
           title: 'E-mail',
@@ -168,14 +286,48 @@ export default class App extends React.Component {
           key: 'email',
           ...this.getColumnSearchProps('email'),
         },
+        {
+          title: 'Time of Day',
+          dataIndex: 'timeOfDay.hours',     //very useful fro mapping values from ui to server
+          key: 'timeOfDay',
+          // ...this.getColumnSearchProps('timeOfDay'), // to be checked while searching
+        },
       ];
+      
         return (
+          <AmplifyAuthenticator usernameAlias="email" style={{ textAlign: 'center' }} >
+            <AmplifySignUp
+        slot="sign-up"
+        usernameAlias="email"
+        formFields={[
+          {
+            type: "email",
+            label: "E-mail*",
+            placeholder: "E-mail address",
+            required: true,
+          },
+          {
+            type: "password",
+            label: "Password*",
+            placeholder: "Password",
+            required: true,
+          },
+          {
+            type: "phone_number",
+            label: "Phone",
+            required: false,
+          },
+        ]} 
+      />
           <Router>
             <div className="App">
                 
                 <Layout>
                     <Header style={{ padding: 10 }}>
+                      
                         <Avatar style={{ float: 'right' }} src='./dp.png' />
+                        <AmplifySignOut class="button" style={{ float: 'right' }}  />
+                        
                         <Title style={{ color: 'white' }} level={3}>Dashboard</Title>
                     </Header>
                     <Layout>
@@ -191,15 +343,15 @@ export default class App extends React.Component {
                                 <SubMenu key='calllog'
                                     title={
                                         <span>
-                                            <Icon type="PhoneOutlined" />
-                                            <span>Calllog</span>
+                                            {/* <SvgIcon component={PhoneIcon} ></SvgIcon>  */}
+                                            <span>Call</span>
                                         </span>
                                     }
                                 >
                                   
 
-                                    <Menu.Item key='History' onClick={(e) => this.setpagename("history")}> History</Menu.Item>
-                                    <Menu.Item key='upcomingcalls' onClick={(e) => this.setpagename("upcomingcalls")}> Upcoming Calls</Menu.Item>
+                                    <Menu.Item key='History' onClick={(e) => this.setpagename("history")}>  History</Menu.Item>
+                                    <Menu.Item key='upcomingcalls' onClick={(e) => this.setpagename("upcomingcalls")}>  Upcoming Calls</Menu.Item>
 
 
                                 </SubMenu>
@@ -212,7 +364,7 @@ export default class App extends React.Component {
                                     }
                                 >
 
-                                    <Menu.Item key='allclients' onClick={(e) => this.setpagename("allclients")} >All Clients</Menu.Item>
+                                    <Menu.Item key='allclients' onClick={this.showClients } >Client list</Menu.Item>
                                     <Menu.Item key='addclient' onClick={(e) => this.setpagename("addclient")}>Add client</Menu.Item>
 
 
@@ -244,7 +396,7 @@ export default class App extends React.Component {
                                             </thead>
                                             <tbody>
                                                 <tr>
-                                                    <td>Nancy</td>
+                                                    <td>{this.state.details[0].careCircle[0].name}</td>
                                                     <td>Today, 5:00pm EST</td>
                                                    
                                                 </tr>
@@ -257,11 +409,11 @@ export default class App extends React.Component {
                                       {  (this.state.pagename === "notifications") ? (<><h1>Notifications</h1></>):(<></>)}
                                        { (this.state.pagename === "allclients") ? (
                                             <>
-                                             <Table columns={columns} dataSource={details} onRowClick={this.showDrawer}  >
+                                             <Table columns={columns} dataSource={this.state.details} onRowClick={this.showDrawer}>
                                   
                                        
                                                </Table>
-                                               <Drawer
+                                               {this.state.visible?(   <Drawer
                                                     title="Individual logs"
                                                     width="450"
                                                     placement="right"
@@ -296,7 +448,8 @@ export default class App extends React.Component {
   </Tabs>
                                                        
                                            
-        </Drawer>
+        </Drawer>):(<></>)}
+                                            
                                             </>
                                         ) : (<></>)
                                     }
@@ -335,7 +488,7 @@ export default class App extends React.Component {
           },
         ]}
       >
-        <Input value={this.state.phno} onChange={this.handleChange1}/>
+        <Input  onChange={this.handleChange1}/>
       </Form.Item>
       <Form.Item
         label="Email"
@@ -349,6 +502,33 @@ export default class App extends React.Component {
       >
         <Input value={this.state.email} onChange={this.handleChange2}/>
       </Form.Item>
+      <Form.Item
+        label="Time of Day"
+        name="timeOfDay"
+        // rules={[
+        //   {
+        //     required: true,
+        //     message: 'Please input the time!',
+        //   },
+        // ]}
+      >
+        <Form.Item
+          name="hour"
+          rules={[{ required: true }]}
+          style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
+        >
+          <Input placeholder="Input hour" onChange={this.handleChange3}/>
+        </Form.Item>
+        <Form.Item
+          name="minutes"
+          rules={[{ required: true }]}
+          style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}
+        >
+          <Input placeholder="Input minutes" onChange={this.handleChange4}/>
+        </Form.Item>
+      </Form.Item>
+        {/* <Input value={this.state.timeOfDay} onChange={this.handleChange3}/> */}
+      {/* </Form.Item> */}
 
       <Form.Item {...tailLayout} name="remember" valuePropName="checked">
         <Checkbox>Remember me</Checkbox>
@@ -398,63 +578,65 @@ export default class App extends React.Component {
             </div>
             
             </Router>
+             </AmplifyAuthenticator>
         );
     }
 }
 
-const details = [{
-    key:'1',
-    name: "Nancy",
-    phno: "9581004247",
-    email: "nancy@gmail.com"
-},
-{
-  key:'2',
-    name: "Dilip",
-    phno: "1232456789",
-    email: "Dilip@gmail.com"
-},
-{
-  key:'3',
-    name: "Blake",
-    phno: "12025312345",
-    email: "blake@gmail.com"
-},{
-  key:'4',
-  name: "Nancy",
-  phno: "9581004247",
-  email: "nancy@gmail.com"
-},
-{
-key:'5',
-  name: "Dilip",
-  phno: "1232456789",
-  email: "Dilip@gmail.com"
-},
-{
-key:'6',
-  name: "Blake",
-  phno: "12025312345",
-  email: "blake@gmail.com"
-},{
-  key:'7',
-  name: "Nancy",
-  phno: "9581004247",
-  email: "nancy@gmail.com"
-},
-{
-key:'8',
-  name: "Dilip",
-  phno: "1232456789",
-  email: "Dilip@gmail.com"
-},
-{
-key:'9',
-  name: "Blake",
-  phno: "12025312345",
-  email: "blake@gmail.com"
-}
-]
+
+// var details = [{
+//     key:'1',
+//     name: "Nancy",
+//     phno: "9581004247",
+//     email: "nancy@gmail.com"
+// },
+// {
+//   key:'2',
+//     name: "Dilip",
+//     phno: "1232456789",
+//     email: "Dilip@gmail.com"
+// },
+// {
+//   key:'3',
+//     name: "Blake",
+//     phno: "12025312345",
+//     email: "blake@gmail.com"
+// },{
+//   key:'4',
+//   name: "Nancy",
+//   phno: "9581004247",
+//   email: "nancy@gmail.com"
+// },
+// {
+// key:'5',
+//   name: "Dilip",
+//   phno: "1232456789",
+//   email: "Dilip@gmail.com"
+// },
+// {
+// key:'6',
+//   name: "Blake",
+//   phno: "12025312345",
+//   email: "blake@gmail.com"
+// },{
+//   key:'7',
+//   name: "Nancy",
+//   phno: "9581004247",
+//   email: "nancy@gmail.com"
+// },
+// {
+// key:'8',
+//   name: "Dilip",
+//   phno: "1232456789",
+//   email: "Dilip@gmail.com"
+// },
+// {
+// key:'9',
+//   name: "Blake",
+//   phno: "12025312345",
+//   email: "blake@gmail.com"
+// }
+// ]
 
 const layout = {
     labelCol: {
@@ -472,11 +654,11 @@ const layout = {
   }
   
   
-export class details1 extends React.Component {
-render()
-{
-  return(
-    <h1>hello</h1>
-  );
-}
-}
+// export class details1 extends React.Component {
+// render()
+// {
+//   return(
+//     <h1>hello</h1>
+//   );
+// }
+// }
