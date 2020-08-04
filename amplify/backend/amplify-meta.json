@@ -1,15 +1,37 @@
 {
-    "providers": {
-        "awscloudformation": {
-            "AuthRoleName": "amplify-amplifyreactapp-dev-162217-authRole",
-            "UnauthRoleArn": "arn:aws:iam::030694233684:role/amplify-amplifyreactapp-dev-162217-unauthRole",
-            "AuthRoleArn": "arn:aws:iam::030694233684:role/amplify-amplifyreactapp-dev-162217-authRole",
-            "Region": "us-east-1",
-            "DeploymentBucketName": "amplify-amplifyreactapp-dev-162217-deployment",
-            "UnauthRoleName": "amplify-amplifyreactapp-dev-162217-unauthRole",
-            "StackName": "amplify-amplifyreactapp-dev-162217",
-            "StackId": "arn:aws:cloudformation:us-east-1:030694233684:stack/amplify-amplifyreactapp-dev-162217/234bd8d0-80e9-11ea-98c6-0e0e50fbc697",
-            "AmplifyAppId": "d1c5zr1ww5mm0y"
-        }
-    }
+	"providers": {
+		"awscloudformation": {
+			"AuthRoleName": "amplify-goodmorningfrontend-dev-94655-authRole",
+			"UnauthRoleArn": "arn:aws:iam::943289198893:role/amplify-goodmorningfrontend-dev-94655-unauthRole",
+			"AuthRoleArn": "arn:aws:iam::943289198893:role/amplify-goodmorningfrontend-dev-94655-authRole",
+			"Region": "us-east-2",
+			"DeploymentBucketName": "amplify-goodmorningfrontend-dev-94655-deployment",
+			"UnauthRoleName": "amplify-goodmorningfrontend-dev-94655-unauthRole",
+			"StackName": "amplify-goodmorningfrontend-dev-94655",
+			"StackId": "arn:aws:cloudformation:us-east-2:943289198893:stack/amplify-goodmorningfrontend-dev-94655/dbc996e0-a669-11ea-84ac-0286ec33b064",
+			"AmplifyAppId": "d2ddbik7j19qjg"
+		}
+	},
+	"auth": {
+		"goodmorningfrontendedba1d25": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": [],
+			"providerMetadata": {
+				"s3TemplateURL": "https://s3.amazonaws.com/amplify-goodmorningfrontend-dev-94655-deployment/amplify-cfn-templates/auth/goodmorningfrontendedba1d25-cloudformation-template.yml",
+				"logicalId": "authgoodmorningfrontendedba1d25"
+			},
+			"lastPushTimeStamp": "2020-06-04T13:54:15.602Z",
+			"output": {
+				"AppClientSecret": "sntebi970u6e826mvhbnlo8p43nagmj00cm05u6g035472jvndv",
+				"UserPoolId": "us-east-2_WAo5fvA5e",
+				"AppClientIDWeb": "59v1ru1402mrp5c4lps940oak4",
+				"AppClientID": "3irtn05qftjbmba67m82o0pfop",
+				"IdentityPoolId": "us-east-2:193fa823-dd3f-4a48-a93d-d2efc1e0094a",
+				"IdentityPoolName": "goodmorningfrontendedba1d25_identitypool_edba1d25__dev",
+				"UserPoolName": "goodmorningfrontendedba1d25_userpool_edba1d25"
+			},
+			"lastPushDirHash": "/Q/8dU1rCq3R3ckCfeZywsXTeNM="
+		}
+	}
 }
