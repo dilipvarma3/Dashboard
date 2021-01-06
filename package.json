@@ -11,7 +11,7 @@
     "antd": "^3.23.4",
     "aws-amplify": "^3.0.15",
     "aws-amplify-react": "^4.1.13",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "mdbreact": "^4.27.0",
     "qs": "^6.9.4",
     "react": "^16.9.0",
